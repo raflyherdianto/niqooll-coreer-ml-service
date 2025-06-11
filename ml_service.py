@@ -2,6 +2,7 @@ import os
 import logging
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
+
 from ml.main import CVJobMatcher, replace_nan_with_none
 
 # --- Inisialisasi Aplikasi Flask ---
@@ -17,10 +18,10 @@ gunicorn_logger = logging.getLogger('gunicorn.error')
 app.logger.handlers = gunicorn_logger.handlers
 app.logger.setLevel(gunicorn_logger.level)
 
-# Pastikan folder uploads ada
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
-    app.logger.info(f"Folder '{UPLOAD_FOLDER}' telah dibuat.")
+# Pastikan folder uploads ada (aman untuk multiple workers)
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+app.logger.info(f"Folder '{app.config['UPLOAD_FOLDER']}' sudah siap.")
+
 
 # --- Inisialisasi Model ---
 app.logger.info("Memulai proses pemuatan model pencocokan CV...")
@@ -39,7 +40,7 @@ def match_cv_endpoint():
     pekerjaan yang cocok.
     """
     app.logger.info("Endpoint '/match' dipanggil.")
-    
+
     if 'cv_pdf' not in request.files:
         app.logger.warning("Permintaan gagal: 'cv_pdf' tidak ditemukan.")
         return jsonify({"error": "File 'cv_pdf' tidak ditemukan dalam permintaan"}), 400
@@ -54,7 +55,7 @@ def match_cv_endpoint():
     if file:
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        
+
         try:
             file.save(filepath)
             app.logger.info(f"File '{filename}' berhasil disimpan di '{filepath}'.")
