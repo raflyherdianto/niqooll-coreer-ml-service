@@ -1,0 +1,10 @@
+pandas
+numpy
+joblib
+scikit-learn
+PyPDF2
+nltk
+tensorflow
+Flask
+gunicorn
+werkzeug
