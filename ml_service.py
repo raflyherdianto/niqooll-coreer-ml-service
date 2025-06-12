@@ -55,7 +55,7 @@ def match_cv_endpoint():
                 }), 500
 
             # Menangani respons dictionary dari find_matching_jobs
-            match_result = matcher.find_matching_jobs(cv_text, top_k=10) #
+            match_result = matcher.find_matching_jobs(cv_text, top_k=30) #
             
             jobs = match_result.get("jobs", [])
             debug_reason = match_result.get("debug_reason", "Tidak ada pesan debug.")
